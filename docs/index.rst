@@ -1,5 +1,5 @@
 Welcome to Taxi Simulator's documentation!
-======================================
+==========================================
 
 Contents:
 
@@ -9,7 +9,8 @@ Contents:
    readme
    installation
    usage
-   modules
+   develop
+   api
    contributing
    authors
    history
