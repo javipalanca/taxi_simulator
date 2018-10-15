@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-
+import asyncio
 import logging
 import random
 import string
 import threading
 import os
+from typing import List, Optional
 
 import pandas as pd
 import time
@@ -175,7 +176,7 @@ class CoordinatorAgent(Agent):
         Returns:
             list, float, float: the path as a list of points, the distance of the path, the estimated duration of the path
         """
-        return request_path(self, origin, destination)
+        return request_path(self, origin, destination, self.route_id)
 
     async def index_controller(self, request):
         """
@@ -428,7 +429,8 @@ class CoordinatorAgent(Agent):
         """
         self.submit(self.async_create_agent(cls, name, password, position, target, speed))
 
-    async def async_create_agent(self, cls, name, password, position, target, speed):
+    async def async_create_agent(self, cls: type, name: str, password: str, position: List[float],
+                                 target: Optional[List[float]], speed: Optional[float]):
         jid = f"{name}@{self.jid.domain}"
         agent = cls(jid, password, loop=self.loop)
         agent.set_id(name)
@@ -443,17 +445,30 @@ class CoordinatorAgent(Agent):
 
         await agent.async_start(auto_register=True)
 
-        if cls == TaxiAgent:
-            strategy = self.taxi_strategy
-            self.add_taxi(agent)
-        else:  # cls == PassengerAgent:
-            strategy = self.passenger_strategy
-            self.add_passenger(agent)
+        with self.lock:
+            if cls == TaxiAgent:
+                strategy = self.taxi_strategy
+                self.add_taxi(agent)
+            else:  # cls == PassengerAgent:
+                strategy = self.passenger_strategy
+                self.add_passenger(agent)
 
         if self.simulation_running:
             agent.add_strategy(strategy)
 
-    def create_agents_batch(self, cls, number: int):
+    async def async_create_agents_batch(self, cls: type, number: int) -> None:
+        coros = []
+        for _ in range(number):
+            suffix = "{}".format("".join(random.sample(string.ascii_letters, 4)))
+            position = random_position()
+            name = "{}_{}".format(faker_factory.user_name(), suffix)
+            password = faker_factory.password()
+            coro = self.async_create_agent(cls, name, password, position, None, None)
+            coros.append(coro)
+
+        await asyncio.gather(*coros)
+
+    def create_agents_batch(self, cls: type, number: int) -> None:
         """
         Creates a batch of agents.
 
@@ -462,17 +477,10 @@ class CoordinatorAgent(Agent):
             number (int): size of the batch
         """
         iterations = [20] * (number // 20)
-        iterations.append(number % 20)
+        if number % 20:
+            iterations.append(number % 20)
         for iteration in iterations:
-            for _ in range(iteration):
-                suffix = "{}".format("".join(random.sample(string.ascii_letters, 4)))
-                with self.lock:
-                    if self.kill_simulator.is_set():
-                        break
-                    position = random_position()
-                    name = "{}_{}".format(faker_factory.user_name(), suffix)
-                    password = faker_factory.password()
-                    self.create_agent(cls, name, password, position, None)
+            self.submit(self.async_create_agents_batch(cls, iteration))
 
 
 class CoordinatorStrategyBehaviour(StrategyBehaviour):

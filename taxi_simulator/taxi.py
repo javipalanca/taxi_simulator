@@ -372,7 +372,7 @@ class TaxiStrategyBehaviour(StrategyBehaviour):
             origin (list): the coordinates of the current location of the passenger
             dest (list): the coordinates of the target destination of the passenger
         """
-        logger.info("Taxi {} on route to passenger {}".format(self.agent.name, passenger_id))
+        logger.debug("Taxi {} on route to passenger {}".format(self.agent.name, passenger_id))
         reply = Message()
         reply.to = passenger_id
         reply.set_metadata("performative", INFORM_PERFORMATIVE)
@@ -402,7 +402,7 @@ class TaxiStrategyBehaviour(StrategyBehaviour):
         """
         if content is None:
             content = {}
-        logger.info("Taxi {} sent proposal to passenger {}".format(self.agent.name, passenger_id))
+        logger.debug("Taxi {} sent proposal to passenger {}".format(self.agent.name, passenger_id))
         reply = Message()
         reply.to = passenger_id
         reply.set_metadata("protocol", REQUEST_PROTOCOL)
@@ -421,7 +421,7 @@ class TaxiStrategyBehaviour(StrategyBehaviour):
         """
         if content is None:
             content = {}
-        logger.info("Taxi {} sent cancel proposal to passenger {}".format(self.agent.name, passenger_id))
+        logger.debug("Taxi {} sent cancel proposal to passenger {}".format(self.agent.name, passenger_id))
         reply = Message()
         reply.to = passenger_id
         reply.set_metadata("protocol", REQUEST_PROTOCOL)

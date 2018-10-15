@@ -114,6 +114,7 @@ async def request_path(agent, origin, destination, route_id):
         agent: the agent who is requesting the path
         origin (list): a list with the origin coordinates [longitude, latitude]
         destination (list): a list with the target coordinates [longitude, latitude]
+        route_id (str): name of the route agent
 
     Returns:
         list, float, float: a list of points (longitude and latitude) representing the path,

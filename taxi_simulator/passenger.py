@@ -136,7 +136,7 @@ class PassengerAgent(Agent):
         Returns:
             list, float, float: A list of points that represent the path from origin to destination, the distance and the estimated duration
         """
-        return await request_path(self, origin, destination)
+        return await request_path(self, origin, destination, self.route_id)
 
     def total_time(self):
         """
@@ -291,7 +291,7 @@ class PassengerStrategyBehaviour(StrategyBehaviour):
         msg.set_metadata("performative", REQUEST_PERFORMATIVE)
         msg.body = json.dumps(content)
         await self.send(msg)
-        self.logger.info("Passenger {} asked for a taxi to {}.".format(self.agent.name, self.agent.dest))
+        self.logger.debug("Passenger {} asked for a taxi to {}.".format(self.agent.name, self.agent.dest))
 
     async def accept_taxi(self, taxi_id):
         """
@@ -313,8 +313,8 @@ class PassengerStrategyBehaviour(StrategyBehaviour):
         reply.body = json.dumps(content)
         await self.send(reply)
         self.agent.taxi_assigned = str(taxi_id)
-        self.logger.info("Passenger {} accepted proposal from taxi {}".format(self.agent.name,
-                                                                              taxi_id))
+        self.logger.debug("Passenger {} accepted proposal from taxi {}".format(self.agent.name,
+                                                                               taxi_id))
 
     async def refuse_taxi(self, taxi_id):
         """
@@ -336,8 +336,8 @@ class PassengerStrategyBehaviour(StrategyBehaviour):
         reply.body = json.dumps(content)
 
         await self.send(reply)
-        self.logger.info("Passenger {} refused proposal from taxi {}".format(self.agent.name,
-                                                                             taxi_id))
+        self.logger.debug("Passenger {} refused proposal from taxi {}".format(self.agent.name,
+                                                                              taxi_id))
 
     async def run(self):
         raise NotImplementedError
