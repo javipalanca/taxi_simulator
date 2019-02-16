@@ -11,5 +11,5 @@ pytest-runner==2.11.1
 PyYAML==3.12
 pytest==3.8.0
 docutils==0.12
-sphinx_rtd_theme==0.4.0
+sphinx_rtd_theme==0.4.3
 sphinxcontrib-napoleon==0.6.1
