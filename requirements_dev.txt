@@ -10,6 +10,6 @@ Sphinx==1.8.0
 pytest-runner==2.11.1
 PyYAML==3.12
 pytest==3.8.0
-docutils==0.12
+docutils==0.16
 sphinx_rtd_theme==0.4.0
 sphinxcontrib-napoleon==0.6.1
